@@ -6,7 +6,7 @@
     <title>Cartão de Visita - Esthéfani Morais</title>
     <style>
         :root {
-            --bg-color: #1a1a1a; /* Fundo escuro para destacar o terracota */
+            --bg-color: #1a1a1a; 
             --card-width: 600px;
             --card-height: 340px;
         }
@@ -19,30 +19,31 @@
             align-items: center;
             min-height: 100vh;
             background-color: var(--bg-color);
-            font-family: sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
         }
 
         /* Container da Perspectiva */
         .card-container {
             width: var(--card-width);
             height: var(--card-height);
-            perspective: 1500px; /* Intensidade do efeito 3D */
+            perspective: 1500px;
+            touch-action: manipulation; /* Otimiza o toque no mobile */
         }
 
-        /* O Cartão em si */
+        /* O Cartão */
         .card-inner {
             position: relative;
             width: 100%;
             height: 100%;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             cursor: pointer;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             border-radius: 20px;
         }
 
-        /* Efeito de Flip no Hover */
-        .card-container:hover .card-inner {
+        /* Classe de giro controlada por JS */
+        .card-inner.flipped {
             transform: rotateY(180deg);
         }
 
@@ -51,10 +52,10 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            backface-visibility: hidden; /* Esconde a face oposta */
+            backface-visibility: hidden;
             border-radius: 20px;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
         .card-front img, .card-back img {
@@ -64,16 +65,19 @@
             display: block;
         }
 
-        /* Lado de trás precisa estar rotacionado por padrão */
+        /* Lado de trás */
         .card-back {
             transform: rotateY(180deg);
         }
 
-        /* Ajuste responsivo para telas menores */
+        /* Ajuste para telas pequenas */
         @media (max-width: 650px) {
             .card-container {
                 width: 90vw;
                 height: 51vw;
+            }
+            .card-front, .card-back {
+                border-radius: 12px; /* Reduz o raio proporcionalmente no mobile */
             }
         }
     </style>
@@ -81,33 +85,54 @@
 <body>
 
     <div class="card-container">
-        <div class="card-inner">
+        <div class="card-inner" id="card">
             <div class="card-front">
-                <img src="Cartao-visita-esthefanimorais.png" alt="Frente do Cartão - Esthéfani Morais">
+                <img src="Cartao-visita-esthefanimorais.png" alt="Frente do Cartão">
             </div>
             <div class="card-back">
-                <img src="Cartao-visita-esthefanimorais (1).png" alt="Verso do Cartão - Esthéfani Morais">
+                <img src="Cartao-visita-esthefanimorais (1).png" alt="Verso do Cartão">
             </div>
         </div>
     </div>
 
     <script>
-        // Pequena interação extra: o cartão segue levemente o mouse
-        const card = document.querySelector('.card-inner');
+        const card = document.getElementById('card');
         const container = document.querySelector('.card-container');
 
+        // Toggle do Giro (Funciona em Mobile e Desktop)
+        container.addEventListener('click', () => {
+            card.classList.toggle('flipped');
+        });
+
+        // Efeito de inclinação suave (Apenas para Desktop com mouse)
         container.addEventListener('mousemove', (e) => {
-            if (window.innerWidth > 768) {
-                let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-                let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-                // Mantém o flip se estiver no hover, mas adiciona inclinação
-                const isFlipped = card.parentElement.matches(':hover') ? 180 : 0;
-                card.style.transform = `rotateY(${isFlipped + xAxis}deg) rotateX(${yAxis}deg)`;
+            // Verifica se o usuário está usando um mouse (pointer: fine)
+            if (window.matchMedia("(pointer: fine)").matches) {
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 15;
+                const rotateY = (centerX - x) / 15;
+
+                const isFlipped = card.classList.contains('flipped') ? 180 : 0;
+                
+                // Aplica a inclinação mantendo a base do flip
+                card.style.transition = 'transform 0.1s linear';
+                card.style.transform = `rotateY(${isFlipped - rotateY}deg) rotateX(${rotateX}deg)`;
             }
         });
 
+        // Reseta a posição quando o mouse sai do container
         container.addEventListener('mouseleave', () => {
-            card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            if (window.matchMedia("(pointer: fine)").matches) {
+                card.style.transition = 'transform 0.6s ease';
+                const isFlipped = card.classList.contains('flipped') ? 180 : 0;
+                card.style.transform = `rotateY(${isFlipped}deg) rotateX(0deg)`;
+            }
         });
     </script>
 </body>
