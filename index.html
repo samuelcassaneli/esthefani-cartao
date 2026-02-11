@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartão de Visita - Esthéfani Morais</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a; /* Fundo escuro para destacar o terracota */
+            --card-width: 600px;
+            --card-height: 340px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: sans-serif;
+        }
+
+        /* Container da Perspectiva */
+        .card-container {
+            width: var(--card-width);
+            height: var(--card-height);
+            perspective: 1500px; /* Intensidade do efeito 3D */
+        }
+
+        /* O Cartão em si */
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            cursor: pointer;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border-radius: 20px;
+        }
+
+        /* Efeito de Flip no Hover */
+        .card-container:hover .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* Faces do Cartão */
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden; /* Esconde a face oposta */
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-front img, .card-back img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Lado de trás precisa estar rotacionado por padrão */
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Ajuste responsivo para telas menores */
+        @media (max-width: 650px) {
+            .card-container {
+                width: 90vw;
+                height: 51vw;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-container">
+        <div class="card-inner">
+            <div class="card-front">
+                <img src="Cartao-visita-esthefanimorais.png" alt="Frente do Cartão - Esthéfani Morais">
+            </div>
+            <div class="card-back">
+                <img src="Cartao-visita-esthefanimorais (1).png" alt="Verso do Cartão - Esthéfani Morais">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pequena interação extra: o cartão segue levemente o mouse
+        const card = document.querySelector('.card-inner');
+        const container = document.querySelector('.card-container');
+
+        container.addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 768) {
+                let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                // Mantém o flip se estiver no hover, mas adiciona inclinação
+                const isFlipped = card.parentElement.matches(':hover') ? 180 : 0;
+                card.style.transform = `rotateY(${isFlipped + xAxis}deg) rotateX(${yAxis}deg)`;
+            }
+        });
+
+        container.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+    </script>
+</body>
+</html>
